@@ -1,16 +1,36 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
+    private PlayerInput PlayerInput;
+    private PlayerInput.OnFootActions onFoot;
+
+    private PlayerMotor motor;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
-        
+        PlayerInput = new PlayerInput();
+        onFoot = PlayerInput.OnFoot;
+        motor = GetComponent<PlayerMotor>();
+        onFoot.Jump.performed += ctx => motor.Jump();
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        motor.ProcessMove(onFoot.Movement.ReadValue<Vector2>());
+    }
+
+    private void OnEnable()
+    {
+        onFoot.Enable();
+    }
+
+    private void OnDisable()
+    {
+        onFoot.Disable();
     }
 }
