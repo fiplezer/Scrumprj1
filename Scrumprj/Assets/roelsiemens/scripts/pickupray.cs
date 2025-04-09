@@ -4,6 +4,7 @@ public class PickUpRay : MonoBehaviour
 {
     [SerializeField] private LayerMask pickUpLayer;
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private Transform cameraRotation;
     [SerializeField] private float kracht = 10f;
     [SerializeField] private float pickUpRange = 5f;
     [SerializeField] private Transform hand;
@@ -51,7 +52,7 @@ public class PickUpRay : MonoBehaviour
         if (currentObjectRb)
         {
             currentObjectRb.MovePosition(hand.position);
-            currentObjectRb.MoveRotation(hand.rotation);
+            currentObjectRb.MoveRotation(cameraRotation.rotation);
         }
     }
 
