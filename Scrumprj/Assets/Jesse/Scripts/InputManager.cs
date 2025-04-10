@@ -9,12 +9,16 @@ public class InputManager : MonoBehaviour
     private PlayerInput.OnFootActions onFoot;
 
     private PlayerMotor motor;
+    private PlayerLook look;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         PlayerInput = new PlayerInput();
         onFoot = PlayerInput.OnFoot;
+
         motor = GetComponent<PlayerMotor>();
+        look = GetComponent<PlayerLook>();
+
         onFoot.Jump.performed += ctx => motor.Jump();
     }
 
@@ -22,6 +26,11 @@ public class InputManager : MonoBehaviour
     void FixedUpdate()
     {
         motor.ProcessMove(onFoot.Movement.ReadValue<Vector2>());
+    }
+
+    private void LateUpdate()
+    {
+        look.ProcessLook(onFoot.Look.ReadValue<Vector2>());
     }
 
     private void OnEnable()
