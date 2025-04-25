@@ -3,36 +3,39 @@ using System.Collections;
 using System.Linq;
 using UnityEngine.Windows.WebCam;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class FaceCapture : MonoBehaviour
 {
     PhotoCapture photoCaptureObject = null;
     Texture2D targetTexture = null;
     [SerializeField] private GameObject Screenshot;
+    public Button btn;
+    public void Foto()
+    {
+            Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
+            targetTexture = new Texture2D(cameraResolution.width, cameraResolution.height);
 
-    // Use this for initialization
+            // Create a PhotoCapture object
+            PhotoCapture.CreateAsync(false, delegate (PhotoCapture captureObject) {
+                photoCaptureObject = captureObject;
+                CameraParameters cameraParameters = new CameraParameters();
+                cameraParameters.hologramOpacity = 0.0f;
+                cameraParameters.cameraResolutionWidth = cameraResolution.width;
+                cameraParameters.cameraResolutionHeight = cameraResolution.height;
+                cameraParameters.pixelFormat = CapturePixelFormat.BGRA32;
+
+                // Activate the camera
+                photoCaptureObject.StartPhotoModeAsync(cameraParameters, delegate (PhotoCapture.PhotoCaptureResult result) {
+                    // Take a picture
+                    photoCaptureObject.TakePhotoAsync(OnCapturedPhotoToMemory);
+                });
+            });
+    }
     void Start()
     {
-        Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
-        targetTexture = new Texture2D(cameraResolution.width, cameraResolution.height);
-
-        // Create a PhotoCapture object
-        PhotoCapture.CreateAsync(false, delegate (PhotoCapture captureObject) {
-            photoCaptureObject = captureObject;
-            CameraParameters cameraParameters = new CameraParameters();
-            cameraParameters.hologramOpacity = 0.0f;
-            cameraParameters.cameraResolutionWidth = cameraResolution.width;
-            cameraParameters.cameraResolutionHeight = cameraResolution.height;
-            cameraParameters.pixelFormat = CapturePixelFormat.BGRA32;
-
-            // Activate the camera
-            photoCaptureObject.StartPhotoModeAsync(cameraParameters, delegate (PhotoCapture.PhotoCaptureResult result) {
-                // Take a picture
-                photoCaptureObject.TakePhotoAsync(OnCapturedPhotoToMemory);
-            });
-        });
+        btn.onClick.AddListener(Foto);
     }
-
     void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
     {
         if (!result.success)
