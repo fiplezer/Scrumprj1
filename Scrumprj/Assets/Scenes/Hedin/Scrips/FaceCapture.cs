@@ -2,11 +2,13 @@ using UnityEngine;
 using System.Collections;
 using System.Linq;
 using UnityEngine.Windows.WebCam;
+using UnityEngine.UI;
 
 public class FaceCapture : MonoBehaviour
 {
     PhotoCapture photoCaptureObject = null;
     Texture2D targetTexture = null;
+    [SerializeField] private GameObject Screenshot;
 
     // Use this for initialization
     void Start()
@@ -42,23 +44,19 @@ public class FaceCapture : MonoBehaviour
         // Copy the raw image data into our target texture
         photoCaptureFrame.UploadImageDataToTexture(targetTexture);
 
-        targetTexture = ApplyZoom(targetTexture, 1.5f);
+        targetTexture = ApplyZoom(targetTexture, 2f);
 
         // Apply oval mask to the captured texture
         ApplyOvalMask(targetTexture);
 
         // Create a gameobject that we can apply our texture to
-        GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        Renderer quadRenderer = quad.GetComponent<Renderer>();
+        Renderer SchreenshotRenderer = Screenshot.GetComponent<Renderer>();
 
         // Use a transparent material to support alpha
         Material transparentMaterial = new Material(Shader.Find("Unlit/Transparent"));
-        quadRenderer.material = transparentMaterial;
+        SchreenshotRenderer.material = transparentMaterial;
 
-        quad.transform.parent = this.transform;
-        quad.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-
-        quadRenderer.material.SetTexture("_MainTex", targetTexture);
+        SchreenshotRenderer.material.SetTexture("_MainTex", targetTexture);
 
         // Deactivate our camera
         photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
